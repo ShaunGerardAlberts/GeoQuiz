@@ -1,3 +1,7 @@
+/**
+ * Author: Shaun Alberts 05-August-2016
+ */
+
 package com.example.shaun.geoquiz2;
 
 import android.support.v7.app.AppCompatActivity;

@@ -1,8 +1,9 @@
+/**
+ * Author: Shaun Alberts
+ * Created: 05-August-2016
+ */
 package com.example.shaun.geoquiz2;
 
-/**
- * Created by shaun on 5/08/16.
- */
 public class Question {
 
     private int mTextResId;

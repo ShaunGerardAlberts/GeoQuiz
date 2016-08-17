@@ -4,6 +4,8 @@
 
 package com.example.shaun.geoquiz2;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +20,11 @@ public class QuizActivity extends AppCompatActivity {
     private Button mfalseButton;
     private Button mNextButton;
     private TextView mQuestionTextView;
+    // cheat button
+    private Button mCheatButton;
+    //hear back from CheatActivity aftet starting it
+    private static final int REQUEST_CODE_CHEAT = 0;
+    private boolean mIsCheater;
 
 
     private Question[] mQuestionBank = new Question[]{
@@ -38,10 +45,15 @@ public class QuizActivity extends AppCompatActivity {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
 
         int messageResId = 0;
-        if (userPressedTrue == answerIsTrue) {
-            messageResId = R.string.correct_toast;
+
+        if (mIsCheater) {
+            messageResId = R.string.judgement_toast;
         } else {
-            messageResId = R.string.incorrect_toast;
+            if (userPressedTrue == answerIsTrue) {
+                messageResId = R.string.correct_toast;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
         }
 
         Toast.makeText(QuizActivity.this, messageResId, Toast.LENGTH_SHORT).show();
@@ -57,6 +69,9 @@ public class QuizActivity extends AppCompatActivity {
         mfalseButton = (Button) findViewById(R.id.false_button);
         mNextButton = (Button) findViewById(R.id.next_button);
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
+        //cheat button
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+
 
         //set text of TextView
 //        mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getTextResId());
@@ -94,9 +109,37 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
 //                mQuestionTextView.setText(mQuestionBank[mCurrentIndex].getTextResId());
+                mIsCheater = false;
                 updateQuestion();
             }
         });
+
+        //Cheat Button
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Intent i = new Intent(QuizActivity.this, CheatActivity.class);
+                boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+                Intent i = CheatActivity.newIntent(QuizActivity.this, answerIsTrue);
+                //startActivity(i);
+                startActivityForResult(i, REQUEST_CODE_CHEAT);
+            }
+        });
+        updateQuestion();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
     }
 
 }
